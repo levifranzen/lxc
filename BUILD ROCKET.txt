@@ -1,0 +1,43 @@
+echo \
+"## Disable Swap
+vm.swappiness = 0
+## IPv4 Configuration
+net.ipv4.tcp_syncookies = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.ping_group_range=999 59999
+kernel.panic = 120
+##Force IPv6 off
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
+rc-update add sysctl
+service sysctl start
+
+
+export RC_VERSION=0.65.2
+set -x 
+apk add curl nodejs-npm mongodb
+apk add python make g++
+curl -ssL https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.25-r0/glibc-2.25-r0.apk -o glibc-2.25-r0.apk
+curl -ssL https://raw.githubusercontent.com/sgerrand/alpine-pkg-glibc/master/sgerrand.rsa.pub -o /etc/apk/keys/sgerrand.rsa.pub
+apk add glibc-2.25-r0.apk
+rm -rf glibc-2.25-r0.apk
+curl -SLf "https://releases.rocket.chat/${RC_VERSION}/download/" -o rocket.chat.tgz 
+curl -SLf "https://releases.rocket.chat/${RC_VERSION}/asc" -o rocket.chat.tgz.asc 
+mkdir -p /app 
+tar -zxf rocket.chat.tgz -C /app 
+rm rocket.chat.tgz rocket.chat.tgz.asc 
+cd /app/bundle/programs/server 
+npm install 
+npm cache clear --force 
+chown -R rocketchat:rocketchat /app
+export DEPLOY_METHOD=docker 
+export NODE_ENV=production 
+export MONGO_URL=mongodb://localhost:27017/rocketchat 
+export HOME=/tmp 
+export PORT=3000 
+export ROOT_URL=http://localhost:3000 
+export Accounts_AvatarStorePath=/app/uploads
+cd /app/bundle
+node main.js

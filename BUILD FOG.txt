@@ -1,0 +1,42 @@
+echo \
+"## Disable Swap
+vm.swappiness = 0
+## IPv4 Configuration
+net.ipv4.tcp_syncookies = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.ping_group_range=999 59999
+kernel.panic = 120
+##Force IPv6 off
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv6.conf.eth0.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
+rc-update add sysctl
+service sysctl start
+cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+echo "America/Sao_Paulo" >  /etc/timezone
+date
+apk del tzdata
+
+
+
+
+export MYSQLPWD=#GrupoFW1753!
+echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
+apk update 
+apk upgrade
+apk add dnsmasq tftp-hpa nfs-utils ncftp openssl sudo php7 apache2 mariadb mysql bash git
+apk add apache2 bc cdrtools curl gcc gzip lftp m4 make mariadb apache-mod-fcgid net-tools nfs-utils openssh openssl perl perl-crypt-passwdmd5 php php7-apache2 php-fpm php-gd php7-mcrypt syslinux tar tftp-hpa unzip vsftpd wget xz
+mysqladmin -u root password $MYSQLPWD
+mkdir /fog
+git clone https://github.com/fogproject/fogproject.git fog/
+cd /fog/bin
+./installfog.sh -y
+rc-update add dnsmasq
+rc-update add tftp 
+rc-update add nfs 
+rc-update add ftp 
+rc-update add mariadb 
+rc-update add mysql 
+rc-update add php7

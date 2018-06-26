@@ -1,0 +1,69 @@
+#### Criado por OpenSea ###
+##
+####### opensea.site #######
+
+# 
+
+### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e não através de script, informe as variaveis antes de colar ###
+
+### Configurações de rede para o Alpine Linux ###
+echo \
+"## Disable Swap
+vm.swappiness = 0
+## IPv4 Configuration
+net.ipv4.tcp_syncookies = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.ping_group_range=999 59999
+kernel.panic = 120
+##Force IPv6 off
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv6.conf.eth0.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
+rc-update add sysctl
+service sysctl start
+
+### Aquisição de variaveis ###
+export MYSQLPWD=
+export GLPIVERSION=9.2.3
+
+### Instalação de depêndencias ###
+apk add wget lighttpd php5-common php5-iconv php5-json php5-gd php5-curl php5-opcache php5-apcu php5-xml php5-pgsql php5-imap php5-cgi fcgi
+apk add php5-pdo php5-pdo_pgsql php5-soap php5-xmlrpc php5-posix php5-mcrypt php5-gettext php5-ldap php5-ctype php5-dom
+apk add mysql mysql-client php5-mysql php5-mysqli
+
+### Configuração de arquivos do lighttpd e PHP5 ###
+sed -i -e 's/#   include "mod_fastcgi.conf"/include "mod_fastcgi.conf"/g' /etc/lighttpd/lighttpd.conf
+sed -i -e 's|/usr/bin/php-cgi|/usr/bin/php-cgi5|g' /etc/lighttpd/mod_fastcgi.conf
+rc-service lighttpd start && rc-update add lighttpd default
+
+### Instalação e inicialização da base MySQL ###
+/usr/bin/mysql_install_db --user=mysql
+/etc/init.d/mariadb start && rc-update add mariadb default
+/usr/bin/mysqladmin --user=root --password="" password $MYSQLPWD
+
+### Criação da base Zabbix ###
+mysql -u root -p$MYSQLPWD
+CREATE DATABASE glpi;
+GRANT ALL PRIVILEGES ON glpi.* TO 'root'@'localhost';
+FLUSH PRIVILEGES;
+EXIT
+
+### Download do GLPI ###
+mkdir -p /usr/share/webapps/
+cd /usr/share/webapps/
+wget https://github.com/glpi-project/glpi/releases/download/$GLPIVERSION/glpi-$GLPIVERSION.tgz
+tar zxvf glpi-$GLPIVERSION.tgz
+rm glpi-$GLPIVERSION.tgz
+
+### Adequação de permissões e finalização ###
+
+chown -R lighttpd:lighttpd /usr/share/webapps/glpi
+chown -R lighttpd:lighttpd /var/log/lighttpd
+chmod -R 755 /usr/share/webapps/glpi/
+rm -R /var/www/localhost/htdocs
+ln -s /usr/share/webapps/glpi /var/www/localhost/htdocs
+(crontab -l && echo "*       *       *       *       *       /usr/bin/php5 /var/www/localhost/htdocs/glpi/front/cron.php &>/dev/null") | crontab -
+service lighttpd restart
+service mariadb restart

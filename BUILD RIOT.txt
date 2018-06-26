@@ -1,0 +1,104 @@
+#### Criado por OpenSea ###
+##
+####### opensea.site #######
+
+# 
+
+### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e não através de script, informe as variaveis antes de colar ###
+
+### Configurações de rede para o Alpine Linux ###
+echo \
+"## Disable Swap
+vm.swappiness = 0
+## IPv4 Configuration
+net.ipv4.tcp_syncookies = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.ping_group_range=999 59999
+kernel.panic = 120
+##Force IPv6 off
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv6.conf.eth0.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
+rc-update add sysctl
+service sysctl start
+
+### Aquisição de variaveis ###
+export SERVER=chat.example.com
+export RIOTVERSION=v0.15.4
+### OBS: Necessario funcionamento adequado de certificados, local padrao /certs ### 
+
+### Instalação de depêndencias ###
+apk add --virtual .matrix-server sqlite-dev libffi-dev build-base libxslt-dev linux-headers python2-dev py-virtualenv libressl-dev libjpeg-turbo-dev 
+apk add nginx git
+
+### Configuração de arquivos do nginx ###
+mkdir /etc/nginx/conf.d/
+echo "server {
+    listen 80;
+    server_name $SERVER;
+    return 301 https://$host$request_uri;
+}
+server {
+
+    listen 443;
+    server_name $SERVER;
+
+    ssl_certificate         /certs/server_crt.pem;
+    ssl_certificate_key     /certs/server_key.pem;
+
+    ssl on;
+    ssl_protocols  TLSv1 TLSv1.1 TLSv1.2;
+    ssl_session_cache  builtin:1000  shared:SSL:10m;
+    ssl_ciphers HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
+    ssl_prefer_server_ciphers on;
+
+    root /opt/riot;
+    index index.html index.htm;
+
+    location /_matrix {
+
+      proxy_pass          http://localhost:8008;
+      proxy_set_header X-Forwarded-For $remote_addr;
+
+    }
+
+    access_log    /var/log/nginx/riot.access.log;
+
+  }" > /etc/nginx/conf.d/matrix.conf
+rc-service nginx start && rc-update add nginx default
+
+### Instalação e inicialização da base Synapse###
+virtualenv -p python2.7 ~/.synapse
+source ~/.synapse/bin/activate
+pip install --upgrade pip
+pip install --upgrade setuptools
+
+### Criação da base Matrix ###
+pip install https://github.com/matrix-org/synapse/tarball/master
+cd ~/.synapse
+python -m synapse.app.homeserver \
+--server-name $SERVER \
+--config-path homeserver.yaml \
+--generate-config \
+--report-stats=no
+source ~/.synapse/bin/activate
+synctl start
+register_new_matrix_user -c homeserver.yaml https://localhost:8448
+
+### Download do Riot ###
+cd /opt
+wget https://github.com/vector-im/riot-web/releases/download/$RIOTVERSION/riot-$RIOTVERSION.tar.gz
+tar -xzf riot-v*.tar.gz
+rm *.tar.gz
+mv riot-v*/ riot/
+cd riot/
+cp config.sample.json config.json
+
+### Adequação de permissões e finalização ###
+chown -R nginx:nginx /opt/riot/
+chown -R nginx:nginx /var/log/nginx
+chmod -R 755 /opt/riot
+service nginx restart
+rc-update add matrix
