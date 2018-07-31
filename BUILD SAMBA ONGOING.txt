@@ -27,8 +27,8 @@ export HOSTNAME=SAMBA4
 export SAMBA_DC_DOMAIN=smb
 export SAMBA_DC_REALM=localdomain.lan
 export SAMBA_DC_DNS_BACKEND=SAMBA_INTERNAL
-export SAMBA_DC_ADMIN_PASSWD=TestYourDomain
-export KERBEROS_PASSWORD=TestYourKRB
+export SAMBA_DC_ADMIN_PASSWD=#TestYourDomain!
+export KERBEROS_PASSWORD=#TestYourKRB!
 
 ### Instalação de depêndencias ###
 apk update --quiet --no-cache 
