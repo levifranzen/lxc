@@ -68,9 +68,22 @@ echo "port=53
 resolv-file=/etc/dnsmasq.resolv
 listen-address=127.0.0.2" > /etc/dnsmasq.d/smb.conf
 
-
-## Adequação de placa de rede"
+### Adequação de placa de rede ###
 echo "auto lo:0
 iface lo:0 inet static
 address 127.0.0.2
 netmask 255.0.0.0" > /etc/network/interfaces
+
+### Provisionar domínio ### ~ Comentado, adeque antes de usar ~
+#samba-tool domain provision \
+#    --use-rfc2307 \
+#    --domain="${SAMBA_DC_DOMAIN}" \
+#    --realm="${SAMBA_DC_REALM}" \
+#    --server-role=dc \
+#    --adminpass="${SAMBA_DC_ADMIN_PASSWD}" \
+#    --dns-backend="${SAMBA_DC_DNS_BACKEND}"
+
+### Adequação de permissões e finalização ###
+chmod -R 0700 /var/log/samba
+rc-update add samba
+
