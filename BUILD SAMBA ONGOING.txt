@@ -33,7 +33,7 @@ export KERBEROS_PASSWORD=
 ### Instalação de depêndencias ###
 apk update --quiet --no-cache 
 apk upgrade --quiet --no-cache
-apk add --quiet --no-cache bash dnsmasq ca-certificates expect krb5 krb5-server openldap-clients samba-dc supervisor
+apk add --quiet --no-cache bash dnsmasq ca-certificates expect krb5 krb5-server openldap-clients samba-dc
 mv /etc/samba/smb.conf /etc/samba/smb.conf.backup
 mkdir -p /var/log/samba/cores
 rm -rf /tmp/*
