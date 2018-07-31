@@ -24,11 +24,11 @@ service sysctl start
 ### Aquisição de variaveis ###
 export LAN=eth3
 export HOSTNAME=SAMBA4
-export SAMBA_DC_DOMAIN=domain.local
-export SAMBA_DC_REALM=
-export SAMBA_DC_DNS_BACKEND=
-export SAMBA_DC_ADMIN_PASSWD=
-export KERBEROS_PASSWORD=
+export SAMBA_DC_DOMAIN=smb
+export SAMBA_DC_REALM=localdomain.lan
+export SAMBA_DC_DNS_BACKEND=SAMBA_INTERNAL
+export SAMBA_DC_ADMIN_PASSWD=TestYourDomain
+export KERBEROS_PASSWORD=TestYourKRB
 
 ### Instalação de depêndencias ###
 apk update --quiet --no-cache 
