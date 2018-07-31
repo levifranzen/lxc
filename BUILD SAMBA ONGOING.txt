@@ -1,5 +1,4 @@
-#### Criado por OpenSea ###
-##
+#### Criado por OpenSea ####
 ####### opensea.site #######
 
 ### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e não através de script, informe as variaveis antes de colar ###
