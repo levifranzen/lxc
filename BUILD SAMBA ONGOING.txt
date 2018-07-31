@@ -71,6 +71,12 @@ iface lo:0 inet static
 address 127.0.0.2
 netmask 255.0.0.0" > /etc/network/interfaces
 
+### Adequação de permissões e inicialização ###
+chmod -R 0700 /var/log/samba
+service dnsmasq start
+rc-update add samba
+rc-update add dnsmasq
+
 ### Provisionar domínio ### ~ Comentado, adeque antes de usar ~
 #samba-tool domain provision \
 #    --use-rfc2307 \
@@ -79,8 +85,3 @@ netmask 255.0.0.0" > /etc/network/interfaces
 #    --server-role=dc \
 #    --adminpass="${SAMBA_DC_ADMIN_PASSWD}" \
 #    --dns-backend="${SAMBA_DC_DNS_BACKEND}"
-
-### Adequação de permissões e finalização ###
-chmod -R 0700 /var/log/samba
-rc-update add samba
-
