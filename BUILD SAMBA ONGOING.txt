@@ -1,3 +1,37 @@
+#### Criado por OpenSea ###
+##
+####### opensea.site #######
+
+### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e não através de script, informe as variaveis antes de colar ###
+
+### Configurações de rede para o Alpine Linux ###
+echo \
+"## Disable Swap
+vm.swappiness = 0
+## IPv4 Configuration
+net.ipv4.tcp_syncookies = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.ping_group_range=999 59999
+kernel.panic = 120
+##Force IPv6 off
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv6.conf.eth0.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
+rc-update add sysctl
+service sysctl start
+
+### Aquisição de variaveis ###
+export LAN=eth3
+export HOSTNAME=SAMBA4
+export SAMBA_DC_DOMAIN=domain.local
+export SAMBA_DC_REALM=
+export SAMBA_DC_DNS_BACKEND=
+export SAMBA_DC_ADMIN_PASSWD=
+export KERBEROS_PASSWORD=
+
+### Instalação de depêndencias ###
 apk update --quiet --no-cache 
 apk upgrade --quiet --no-cache
 apk add --quiet --no-cache bash dnsmasq ca-certificates expect krb5 krb5-server openldap-clients samba-dc supervisor
@@ -6,6 +40,7 @@ mkdir -p /var/log/samba/cores
 rm -rf /tmp/*
 rm -rf /var/cache/apk/*
 
+### Configuração de arquivos do samba e dnsmasq ###
 echo "[global]
    workgroup = MYGROUP
    dns forwarder 127.0.0.2
@@ -14,7 +49,7 @@ echo "[global]
    server role = standalone server
    log file = /usr/local/samba/var/log.%m
    max log size = 50
-   interfaces = eth3 lo
+   interfaces = ${LAN} lo
    dns proxy = no
 
 [homes]
@@ -34,6 +69,8 @@ echo "port=53
 resolv-file=/etc/dnsmasq.resolv
 listen-address=127.0.0.2" > /etc/dnsmasq.d/smb.conf
 
+
+## Adequação de placa de rede"
 echo "auto lo:0
 iface lo:0 inet static
 address 127.0.0.2
