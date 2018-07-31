@@ -1,20 +1,10 @@
- apk update --quiet --no-cache && \
-  apk upgrade --quiet --no-cache && \
-  apk add --quiet --no-cache \
-    bash \
-    dnsmasq \
-    ca-certificates \
-    expect \
-    krb5 \
-    krb5-server \
-    openldap-clients \
-    samba-dc \
-    supervisor && \
-  mv /etc/samba/smb.conf /etc/samba/smb.conf.backup && \
-  mkdir -p /var/log/samba/cores && \
-  rm -rf \
-    /tmp/* \
-    /var/cache/apk/*
+apk update --quiet --no-cache 
+apk upgrade --quiet --no-cache
+apk add --quiet --no-cache bash dnsmasq ca-certificates expect krb5 krb5-server openldap-clients samba-dc supervisor
+mv /etc/samba/smb.conf /etc/samba/smb.conf.backup
+mkdir -p /var/log/samba/cores
+rm -rf /tmp/*
+rm -rf /var/cache/apk/*
 
 echo "[global]
    workgroup = MYGROUP
