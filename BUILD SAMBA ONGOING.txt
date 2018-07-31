@@ -1,5 +1,21 @@
+ apk update --quiet --no-cache && \
+  apk upgrade --quiet --no-cache && \
+  apk add --quiet --no-cache \
+    bash \
+    dnsmasq \
+    ca-certificates \
+    expect \
+    krb5 \
+    krb5-server \
+    openldap-clients \
+    samba-dc \
+    supervisor && \
+  mv /etc/samba/smb.conf /etc/samba/smb.conf.backup && \
+  mkdir -p /var/log/samba/cores && \
+  rm -rf \
+    /tmp/* \
+    /var/cache/apk/*
 
-cp /etc/samba/smb.conf /etc/samba/smb.conf.backup
 echo "[global]
    workgroup = MYGROUP
    dns forwarder 127.0.0.2
