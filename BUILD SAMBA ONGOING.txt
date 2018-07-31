@@ -40,13 +40,24 @@ rm -rf /tmp/*
 rm -rf /var/cache/apk/*
 
 ### Configuração de arquivos do samba e dnsmasq ###
+mkdir -p /var/lib/samba/sysvol/
 echo "[global]
+   server role = active directory domain controller
+   workgroup = ${SAMBA_DC_DOMAIN}
    dns forwarder 127.0.0.2
    bind interfaces only = yes
    log file = /usr/local/samba/var/log.%m
    max log size = 50
    interfaces = ${LAN} lo
    dns proxy = no
+
+[netlogon]
+   path = /var/lib/samba/sysvol/%REALNAMES%/scripts
+   read only = No
+
+[sysvol]
+   path = /var/lib/samba/sysvol/
+   read only = No
 
 [homes]
    comment = Home Directories
@@ -72,7 +83,11 @@ address 127.0.0.2
 netmask 255.0.0.0" > /etc/network/interfaces
 
 ### Adequação de permissões e inicialização ###
-chmod -R 0700 /var/log/samba
+chown -R nobody.nogroup /var/lib/samba/sysvol/%REALMNAME%/scripts
+chmod 771 /var/lib/samba/sysvol
+chmod 771 /var/lib/samba/sysvol/%REALMNAME%
+chmod 771 /var/lib/samba/sysvol/%REALMNAME%/scripts
+chmod -R 700 /var/log/samba
 service dnsmasq start
 rc-update add samba
 rc-update add dnsmasq
