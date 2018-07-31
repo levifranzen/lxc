@@ -41,11 +41,8 @@ rm -rf /var/cache/apk/*
 
 ### Configuração de arquivos do samba e dnsmasq ###
 echo "[global]
-   workgroup = MYGROUP
    dns forwarder 127.0.0.2
    bind interfaces only = yes
-   server string = Samba Server
-   server role = standalone server
    log file = /usr/local/samba/var/log.%m
    max log size = 50
    interfaces = ${LAN} lo
