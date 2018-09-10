@@ -1,12 +1,9 @@
-#### Criado por OpenSea ###
-##
+#### Criado por OpenSea ####
 ####### opensea.site #######
 
-# 
+### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e n√£o atrav√©s de script, informe as variaveis antes de colar ###
 
-### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e n„o atravÈs de script, informe as variaveis antes de colar ###
-
-### ConfiguraÁıes de rede para o Alpine Linux ###
+### Configura√ß√µes de rede para o Alpine Linux ###
 echo \
 "## Disable Swap
 vm.swappiness = 0
@@ -24,16 +21,16 @@ net.ipv6.conf.eth0.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
 rc-update add sysctl
 service sysctl start
 
-### AquisiÁ„o de variaveis ###
+### Aquisi√ß√£o de variaveis ###
 export SERVER=chat.example.com
 export RIOTVERSION=v0.15.4
 ### OBS: Necessario funcionamento adequado de certificados, local padrao /certs ### 
 
-### InstalaÁ„o de depÍndencias ###
+### Instala√ß√£o de dep√™ndencias ###
 apk add --virtual .matrix-server sqlite-dev libffi-dev build-base libxslt-dev linux-headers python2-dev py-virtualenv libressl-dev libjpeg-turbo-dev 
 apk add nginx git
 
-### ConfiguraÁ„o de arquivos do nginx ###
+### Configura√ß√£o de arquivos do nginx ###
 mkdir /etc/nginx/conf.d/
 echo "server {
     listen 80;
@@ -69,13 +66,13 @@ server {
   }" > /etc/nginx/conf.d/matrix.conf
 rc-service nginx start && rc-update add nginx default
 
-### InstalaÁ„o e inicializaÁ„o da base Synapse###
+### Instala√ß√£o e inicializa√ß√£o da base Synapse###
 virtualenv -p python2.7 ~/.synapse
 source ~/.synapse/bin/activate
 pip install --upgrade pip
 pip install --upgrade setuptools
 
-### CriaÁ„o da base Matrix ###
+### Cria√ß√£o da base Matrix ###
 pip install https://github.com/matrix-org/synapse/tarball/master
 cd ~/.synapse
 python -m synapse.app.homeserver \
@@ -96,7 +93,7 @@ mv riot-v*/ riot/
 cd riot/
 cp config.sample.json config.json
 
-### AdequaÁ„o de permissıes e finalizaÁ„o ###
+### Adequa√ß√£o de permiss√µes e finaliza√ß√£o ###
 chown -R nginx:nginx /opt/riot/
 chown -R nginx:nginx /var/log/nginx
 chmod -R 755 /opt/riot
