@@ -1,12 +1,33 @@
-#### Criado por OpenSea ###
-##
-####### opensea.site #######
+#### Criado por OpenSea ####
+####### u.nu/opensea #######
 
-# 
+### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e nÃ£o atravÃ©s de script, informe as variaveis antes de colar ###
 
-### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e não através de script, informe as variaveis antes de colar ###
+### ConfiguraÃ§Ãµes de rede para o Alpine Linux ###
+echo \
+"## Disable Swap
+vm.swappiness = 0
+## IPv4 Configuration
+net.ipv4.tcp_syncookies = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.ping_group_range=999 59999
+kernel.panic = 120
+##Force IPv6 off
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv6.conf.eth0.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
+rc-update add sysctl
+service sysctl start
+## Timezone
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+apk update
+apk add tzdata
+cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+echo "America/Sao_Paulo" > /etc/timezone
 
-### Configurações de rede para o Alpine Linux ###
+### ConfiguraÃ§Ãµes de rede para o Alpine Linux ###
 echo \
 "## Disable Swap
 vm.swappiness = 0
@@ -23,31 +44,31 @@ net.ipv6.conf.lo.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
 rc-update add sysctl
 service sysctl start
 
-### Aquisição de variaveis ###
+### AquisiÃ§Ã£o de variaveis ###
 export VERSION=5.7.23
 
-### Instalação de depêndencias ###
+### InstalaÃ§Ã£o de depÃªndencias ###
 apk add openjdk8-jre mongodb wget s6
 
-### Criação de usuário e pasta para aplicação ###
+### CriaÃ§Ã£o de usuÃ¡rio e pasta para aplicaÃ§Ã£o ###
 adduser -D -H unifi
 mkdir /srv/unifi
 cd /srv/unifi
 
-### Download da aplicação ###
+### Download da aplicaÃ§Ã£o ###
 wget http://www.ubnt.com/downloads/unifi/$VERSION/UniFi.unix.zip
 unzip UniFi.unix.zip
 cp -R UniFi/* .
 rm -R UniFi.unix.zip
 
-### Adequação de permissões ###
+### AdequaÃ§Ã£o de permissÃµes ###
 chown -R unifi:unifi /srv/unifi
 chmod -R 755 /srv/unifi
 cd /srv/unifi/bin
 rm mongod
 ln -s /usr/bin/mongod
 
-### Criação de serviço no S6 ###
+### CriaÃ§Ã£o de serviÃ§o no S6 ###
 mkdir -p /etc/unifi/log
 echo '#!/bin/ash
 
