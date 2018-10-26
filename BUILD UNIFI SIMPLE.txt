@@ -1,12 +1,9 @@
-#### Criado por OpenSea ###
-##
-####### opensea.site #######
+#### Criado por OpenSea ####
+####### u.nu/opensea #######
 
-# 
+### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e nÃ£o atravÃ©s de script, informe as variaveis antes de colar ###
 
-### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e não através de script, informe as variaveis antes de colar ###
-
-### Configurações de rede para o Alpine Linux ###
+### ConfiguraÃ§Ãµes de rede para o Alpine Linux ###
 echo \
 "## Disable Swap
 vm.swappiness = 0
@@ -19,35 +16,42 @@ kernel.panic = 120
 ##Force IPv6 off
 net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv6.conf.eth0.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
 rc-update add sysctl
 service sysctl start
+## Timezone
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+apk update
+apk add tzdata
+cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+echo "America/Sao_Paulo" > /etc/timezone
 
-### Aquisição de variaveis ###
+### AquisiÃ§Ã£o de variaveis ###
 export VERSION=5.7.23
 
-### Instalação de depêndencias ###
+### InstalaÃ§Ã£o de depÃªndencias ###
 apk add openjdk8-jre mongodb wget
 
-### Criação de usuário e pasta para aplicação ###
+### CriaÃ§Ã£o de usuÃ¡rio e pasta para aplicaÃ§Ã£o ###
 adduser -D -H unifi
 mkdir /unifi
 cd /unifi
 
-### Download da aplicação ###
+### Download da aplicaÃ§Ã£o ###
 wget http://www.ubnt.com/downloads/unifi/$VERSION/UniFi.unix.zip
 unzip UniFi.unix.zip
 cp -R UniFi/* .
 rm -R UniFi.unix.zip
 
-### Adequação de permissões ###
+### AdequaÃ§Ã£o de permissÃµes ###
 chown -R unifi:unifi /unifi
 chmod -R 755 /unifi
 cd /unifi/bin
 rm mongod
 ln -s /usr/bin/mongod
 
-### Criação de serviço ###
+### CriaÃ§Ã£o de serviÃ§o ###
 mkdir -p /var/log/unifi/
 echo '#!/bin/ash
 chmod 755 /etc/init.d/unifi
