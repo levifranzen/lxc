@@ -1,12 +1,9 @@
-#### Criado por OpenSea ###
-##
-####### opensea.site #######
+#### Criado por OpenSea ####
+####### u.nu/opensea #######
 
-# 
+### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e n√£o atrav√©s de script, informe as variaveis antes de colar ###
 
-### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e n„o atravÈs de script, informe as variaveis antes de colar ###
-
-### ConfiguraÁıes de rede para o Alpine Linux ###
+### Configura√ß√µes de rede para o Alpine Linux ###
 echo \
 "## Disable Swap
 vm.swappiness = 0
@@ -15,9 +12,6 @@ net.ipv4.tcp_syncookies = 1
 net.ipv4.conf.default.rp_filter = 1
 net.ipv4.conf.all.rp_filter = 1
 net.ipv4.ping_group_range=999 59999
-net.ipv4.tcp_keepalive_time = 1800
-net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_tw_recycle = 1
 kernel.panic = 120
 ##Force IPv6 off
 net.ipv6.conf.all.disable_ipv6 = 1
@@ -26,18 +20,24 @@ net.ipv6.conf.lo.disable_ipv6 = 1
 net.ipv6.conf.eth0.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
 rc-update add sysctl
 service sysctl start
+## Timezone
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+apk update
+apk add tzdata
+cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+echo "America/Sao_Paulo" > /etc/timezone
 
-### AquisiÁ„o de variaveis ###
+### Aquisi√ß√£o de variaveis ###
 export MYSQLPWD=
 export ZABBIXUSERPWD=
 export ZABBIXVERSION=
 
-### InstalaÁ„o de depÍndencias ###
+### Instala√ß√£o de dep√™ndencias ###
 apk add lighttpd php5-common php5-iconv php5-json php5-gd php5-curl php5-xml php5-pgsql php5-imap php5-cgi fcgi 
 apk add php5-pdo php5-pdo_pgsql php5-soap php5-xmlrpc php5-posix php5-mcrypt php5-gettext php5-ldap php5-ctype php5-dom php5-bcmath php5-xmlreader php5-sockets
 apk add mysql mysql-client php5-mysql php5-mysqli zabbix zabbix-mysql zabbix-utils zabbix-agent zabbix-webif
 
-### ConfiguraÁ„o de arquivos do lighttpd e PHP5 ###
+### Configura√ß√£o de arquivos do lighttpd e PHP5 ###
 sed -i -e 's/#   include "mod_fastcgi.conf"/include "mod_fastcgi.conf"/g' /etc/lighttpd/lighttpd.conf
 sed -i -e 's|/usr/bin/php-cgi|/usr/bin/php-cgi5|g' /etc/lighttpd/mod_fastcgi.conf
 rc-service lighttpd start && rc-update add lighttpd default
@@ -52,12 +52,12 @@ always_populate_raw_post_data = -1
 date.timezone = America/Sao_Paulo" > /etc/php5/php.ini
 
 
-### InstalaÁ„o e inicializaÁ„o da base MySQL ###
+### Instala√ß√£o e inicializa√ß√£o da base MySQL ###
 /usr/bin/mysql_install_db --user=mysql
 /etc/init.d/mariadb start && rc-update add mariadb default
 /usr/bin/mysqladmin --user=root --password="" password $MYSQLPWD
 
-### CriaÁ„o da base Zabbix ###
+### Cria√ß√£o da base Zabbix ###
 mysql -u root -p$MYSQLPWD
 create database zabbix character set utf8 collate utf8_bin;
 create user 'zabbix'@'localhost';
@@ -68,7 +68,7 @@ mysql -u root -p$MYSQLPWD -e "SET PASSWORD FOR 'zabbix'@'localhost' = PASSWORD('
 flush privileges;
 exit;
 
-### AlteraÁ„o de arquivos de configuraÁ„o do Zabbix ###
+### Altera√ß√£o de arquivos de configura√ß√£o do Zabbix ###
 cp /etc/zabbix/zabbix_server.conf /etc/zabbix/zabbix_server.conf.backup
 sed -i -e 's/# DBHost=localhost/DBHost=localhost/g' /etc/zabbix/zabbix_server.conf
 sed -ie '/^# DBPassword=/a DBPassword='$ZABBIXUSERPWD'' /etc/zabbix/zabbix_server.conf
@@ -76,7 +76,7 @@ sed -i -e 's|# DBSocket=/tmp/mysql.sock|DBSocket=/run/mysqld/mysqld.sock|g' /etc
 sed -i -e 's/# DBHost=localhost/DBHost=localhost/g' /etc/zabbix/zabbix_server.conf
 sed -ie '/^skip-external-locking/a bind-address = 0.0.0.0' /etc/mysql/my.cnf
 
-### ImportaÁ„o de tabelas, n„o disponÌveis na distribuiÁ„o ###
+### Importa√ß√£o de tabelas, n√£o dispon√≠veis na distribui√ß√£o ###
 wget https://ufpr.dl.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/$ZABBIXVERSION/zabbix-$ZABBIXVERSION.tar.gz
 tar zxf zabbix-$ZABBIXVERSION.tar.gz
 mv zabbix-3.4.9/database/mysql .
@@ -87,7 +87,7 @@ mysql -uzabbix -p$ZABBIXUSERPWD zabbix < schema.sql
 mysql -uzabbix -p$ZABBIXUSERPWD zabbix < images.sql
 mysql -uzabbix -p$ZABBIXUSERPWD zabbix < data.sql && cd .. && rm -R mysql
 
-### AdequaÁ„o de permissıes e finalizaÁ„o ###
+### Adequa√ß√£o de permiss√µes e finaliza√ß√£o ###
 chown -R lighttpd:lighttpd /usr/share/webapps/
 chown -R lighttpd:lighttpd /var/log/lighttpd
 chmod -R 755 /usr/share/webapps/
