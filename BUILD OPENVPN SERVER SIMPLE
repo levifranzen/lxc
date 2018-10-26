@@ -33,7 +33,10 @@ apk add tzdata
 cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 echo "America/Sao_Paulo" > /etc/timezone
 
+### Instalação ###
 apk add openvpn
+
+### Gerando arquivo de configuração simples ###
 echo "dev tun
 ifconfig 10.8.0.1 10.8.0.2
 secret static.key
@@ -44,6 +47,11 @@ persist-key
 user nobody
 group nobody
 daemon" > /etc/openvpn/openvpn.conf
+
+### Gerar chave estática ###
 openvpn --genkey --secret /etc/openvpn/static.key
+
+### Inicialização do serviço ###
+chmod 600 /etc/openvpn/static.key
 rc-update add openvpn
 service openvpn start
