@@ -1,0 +1,51 @@
+#### Criado por OpenSea ####
+####### u.nu/opensea #######
+
+### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e não através de script, informe as variaveis antes de colar ###
+
+### Aquisição de variaveis ###
+export DESTADDR=EXAMPLE.COM
+
+####### IMPORTANTE ########
+### Descomente e adicione as linhas abaixo ao final do arquivo de configuração do container
+#lxc.mount.entry = /dev/net dev/net none bind,create=dir
+#lxc.cgroup.devices.allow = c 10:200 rwm
+####### IMPORTANTE #######
+
+### Configurações de rede para o Alpine Linux ###
+echo \
+"## Disable Swap
+vm.swappiness = 0
+## IPv4 Configuration
+net.ipv4.tcp_syncookies = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.ping_group_range=999 59999
+kernel.panic = 120
+##Force IPv6 off
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv6.conf.eth0.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
+rc-update add sysctl
+service sysctl start
+## Timezone
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+apk update
+apk add tzdata
+cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+echo "America/Sao_Paulo" > /etc/timezone
+
+### Gerando arquivo simples de configuração ###
+echo "remote $DESTADDR
+dev tun
+ifconfig 10.8.0.2 10.8.0.1
+secret static.key" > /etc/openvpn/openvpn.conf
+
+### Copie a chave gerada no Server ###
+cat /etc/openvpn/static.key
+
+### Inicialização do serviço ###
+chmod 600 /etc/openvpn/static.key
+rc-update add openvpn
+service openvpn start
