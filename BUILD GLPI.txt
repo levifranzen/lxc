@@ -3,6 +3,10 @@
 
 ### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e não através de script, informe as variaveis antes de colar ###
 
+### Aquisição de variaveis ###
+export MYSQLPWD=
+export GLPIVERSION=9.2.4
+
 ### Configurações de rede para o Alpine Linux ###
 echo \
 "## Disable Swap
@@ -20,10 +24,6 @@ net.ipv6.conf.lo.disable_ipv6 = 1
 net.ipv6.conf.eth0.disable_ipv6 = 1" > /etc/sysctl.d/00-alpine.conf
 rc-update add sysctl
 service sysctl start
-
-### Aquisição de variaveis ###
-export MYSQLPWD=
-export GLPIVERSION=9.2.4
 
 ### Instalação de depêndencias ###
 apk add wget lighttpd php5-common php5-iconv php5-json php5-gd php5-curl php5-opcache php5-apcu php5-xml php5-pgsql php5-imap php5-cgi fcgi php5-cas
