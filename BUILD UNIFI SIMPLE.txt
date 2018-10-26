@@ -3,6 +3,9 @@
 
 ### Os comandos devem ser rodados diretamente no Shell (Copia e cola) e não através de script, informe as variaveis antes de colar ###
 
+### Aquisição de variaveis ###
+export VERSION=5.7.23
+
 ### Configurações de rede para o Alpine Linux ###
 echo \
 "## Disable Swap
@@ -26,9 +29,6 @@ apk update
 apk add tzdata
 cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 echo "America/Sao_Paulo" > /etc/timezone
-
-### Aquisição de variaveis ###
-export VERSION=5.7.23
 
 ### Instalação de depêndencias ###
 apk add openjdk8-jre mongodb wget
