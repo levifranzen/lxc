@@ -1,6 +1,6 @@
 #!/bin/sh
-### Criado por OpenSea ###
-###### opensea.site ######
+####### Criado por OpenSea #######
+### openseatecnologia.github.io ##
 
 # Informe as variaveis conforme cenario
 # Nome do Container
