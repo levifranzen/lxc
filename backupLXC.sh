@@ -1,6 +1,7 @@
 #!/bin/bash
-### Criado por OpenSea ###
-###### opensea.site ######
+####### Criado por OpenSea #######
+### openseatecnologia.github.io ##
+
 echo "Backup e Restore de Containers LXC"
 PS3='Informe sua escolha: '
 options=("1 - Backup de container LXC" "2 - Restore de container LXC" "3 - Sair")
