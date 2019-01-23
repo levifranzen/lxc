@@ -79,9 +79,9 @@ sed -ie '/^skip-external-locking/a bind-address = 0.0.0.0' /etc/mysql/my.cnf
 ### Importação de tabelas, não disponíveis na distribuição ###
 wget https://ufpr.dl.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/$ZABBIXVERSION/zabbix-$ZABBIXVERSION.tar.gz
 tar zxf zabbix-$ZABBIXVERSION.tar.gz
-mv zabbix-3.4.9/database/mysql .
-rm zabbix-3.4.9.tar.gz
-rm zabbix-3.4.9 -R
+mv zabbix-$ZABBIXVERSION/database/mysql .
+rm zabbix-$ZABBIXVERSION.tar.gz
+rm zabbix-$ZABBIXVERSION -R
 cd mysql
 mysql -uzabbix -p$ZABBIXUSERPWD zabbix < schema.sql
 mysql -uzabbix -p$ZABBIXUSERPWD zabbix < images.sql
